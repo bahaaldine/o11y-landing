@@ -670,72 +670,146 @@
 </section>
 
 <!-- ═══ LOGS SECTION ════════════════════════════════════════════════ -->
+<style>
+  .logs-three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media(max-width:960px) { .logs-three-col { grid-template-columns: 1fr; } }
+  .logs-feature-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 20px;
+    padding: 36px 30px; display: flex; flex-direction: column; gap: 16px;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .logs-feature-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.09); transform: translateY(-3px); }
+  .logs-feat-icon svg { width: 48px; height: 48px; }
+  .logs-feat-tag {
+    display: inline-flex; width: fit-content;
+    background: rgba(0,119,204,.1); color: var(--blue);
+    font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+  }
+  .logs-feat-tag-teal { background: rgba(0,191,179,.12); color: var(--teal-dk); }
+  .logs-feature-card h3 { font-size: 20px; font-weight: 800; color: var(--dark); line-height: 1.2; }
+  .logs-feature-card > p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+  .logs-feature-card code { background: rgba(0,119,204,.08); color: var(--blue); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  .logs-stats { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .logs-stat-row { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; background: var(--light); border-radius: 10px; border: 1px solid var(--border); }
+  .logs-stat-num { font-size: 20px; font-weight: 800; color: var(--blue); min-width: 52px; line-height: 1; }
+  .logs-stat-desc { font-size: 13px; color: var(--muted); line-height: 1.4; }
+  .logs-feat-link { font-size: 13px; font-weight: 700; color: var(--blue); margin-top: auto; }
+  .logs-feat-link:hover { text-decoration: underline; }
+  .logs-feat-coming { font-size: 12px; font-weight: 600; color: var(--teal-dk); font-style: italic; margin-top: auto; }
+  .logs-improvements { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .logs-improvement-row { display: flex; align-items: center; gap: 10px; }
+  .logs-imp-label { font-size: 12px; color: var(--muted); width: 150px; min-width: 150px; line-height: 1.3; }
+  .logs-imp-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+  .logs-imp-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); border-radius: 100px; }
+  .logs-imp-num { font-size: 13px; font-weight: 800; color: var(--blue); white-space: nowrap; min-width: 44px; text-align: right; }
+  .logs-summary-badge { background: linear-gradient(90deg, var(--blue), #004e99); color: white; font-size: 13px; font-weight: 700; padding: 11px 16px; border-radius: 10px; text-align: center; margin-top: auto; }
+</style>
+
 <section class="logs-section">
   <div class="container">
-    <div class="logs-inner">
-      <div>
-        <span class="section-label">What's next</span>
-        <h2 class="logs-title"><strong>Best in Class Efficiency</strong><br>for Logs — coming next.</h2>
-        <p class="logs-body">We applied the same engineering discipline that made our metrics engine industry-leading to logs. We're not there yet — but the trajectory is clear and the targets are ambitious.</p>
+    <div class="text-center" style="margin-bottom:52px;">
+      <span class="section-label">Logs</span>
+      <h2 class="section-title"><strong>Best in Class Efficiency</strong> for Logs</h2>
+      <p class="section-sub" style="margin-bottom:0;">Three compounding engineering bets — each independently significant, together transformational.</p>
+    </div>
 
-        <div class="logs-pillars">
-          <div class="logs-pillar">
-            <div class="pillar-icon">
-              <svg viewBox="0 0 26 26" fill="none"><path d="M4 8c5 0 13-2 18 2" stroke="#00BFB3" stroke-width="2" stroke-linecap="round"/><path d="M4 14c5 0 13-2 18 2" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/><path d="M4 20c5 0 13-2 18 2" stroke="#69707D" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-            <div class="pillar-content">
-              <h4>Compression</h4>
-              <p>Columnar storage and compressed binary doc values — storing significantly more for less.</p>
-            </div>
-            <div class="pillar-target">Target: &gt;2x</div>
+    <div class="logs-three-col">
+
+      <!-- LOGSDB -->
+      <div class="logs-feature-card">
+        <div class="logs-feat-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="14" fill="#EBF4FF"/>
+            <ellipse cx="24" cy="17" rx="13" ry="5" stroke="#0077CC" stroke-width="2.5"/>
+            <path d="M11 17v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" stroke="#0077CC" stroke-width="2.5"/>
+            <path d="M11 24v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" stroke="#00BFB3" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="logs-feat-tag">GA · 8.17+</div>
+        <h3>LogsDB Index Mode</h3>
+        <p>A purpose-built index mode for log data. Smart sorting by <code>host.name</code> and <code>@timestamp</code> places similar records adjacent, dramatically improving compression. Synthetic <code>_source</code> reconstructs fields on demand — no redundant storage.</p>
+        <div class="logs-stats">
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">65%</span>
+            <span class="logs-stat-desc">storage reduction vs standard Elasticsearch</span>
           </div>
-          <div class="logs-pillar">
-            <div class="pillar-icon">
-              <svg viewBox="0 0 26 26" fill="none"><path d="M13 4v10l5 5" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="14" r="9" stroke="#00BFB3" stroke-width="2"/></svg>
-            </div>
-            <div class="pillar-content">
-              <h4>Ingestion Speed</h4>
-              <p>As volumes grow, ingestion keeps up — scaled across nodes with linear throughput gains.</p>
-            </div>
-            <div class="pillar-target">Target: &gt;2x</div>
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">50%</span>
+            <span class="logs-stat-desc">TCO reduction for long-term log retention</span>
           </div>
-          <div class="logs-pillar">
-            <div class="pillar-icon">
-              <svg viewBox="0 0 26 26" fill="none"><polyline points="3,19 8,12 13,15 18,7 23,10" stroke="#0077CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-            </div>
-            <div class="pillar-content">
-              <h4>Query Performance</h4>
-              <p>LuceneSource DOC partitioning and Swiss hashtables already improving query times 3–11x.</p>
-            </div>
-            <div class="pillar-target">Improving fast</div>
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">30%</span>
+            <span class="logs-stat-desc">additional savings from smart index sorting alone</span>
           </div>
         </div>
+        <a href="https://www.elastic.co/search-labs/blog/elasticsearch-logsdb-index-mode" class="logs-feat-link" target="_blank">Read the deep dive →</a>
       </div>
 
-      <!-- Visual: progress bars -->
-      <div class="logs-visual">
-        <div class="logs-vis-title">Storage efficiency progress (bytes/record)</div>
-        <div class="logs-bar-row">
-          <div class="logs-bar-item">
-            <div class="logs-bar-label"><span>Elasticsearch (today)</span><strong>805 B</strong></div>
-            <div class="logs-bar-track"><div class="logs-bar-fill fill-muted" style="width:100%"></div></div>
+      <!-- DOC VALUES ONLY -->
+      <div class="logs-feature-card">
+        <div class="logs-feat-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="14" fill="#E6FAF9"/>
+            <path d="M14 34V18l10-6 10 6v16l-10 6-10-6z" stroke="#00BFB3" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M14 18l10 6 10-6M24 24v16" stroke="#00BFB3" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logs-feat-tag logs-feat-tag-teal">In development</div>
+        <h3>Doc-Values-Only Mode</h3>
+        <p>By skipping inverted indexes and BKD trees entirely and using compressed binary doc-values, Elasticsearch achieves near-columnar storage density — optimized for high-volume analytics workloads where every byte counts.</p>
+        <div class="logs-stats">
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">168 B</span>
+            <span class="logs-stat-desc">per record in doc-values mode</span>
           </div>
-          <div class="logs-bar-item">
-            <div class="logs-bar-label"><span>Elasticsearch doc-values</span><strong>168 B</strong></div>
-            <div class="logs-bar-track"><div class="logs-bar-fill fill-blue" style="width:21%"></div></div>
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">~5x</span>
+            <span class="logs-stat-desc">improvement vs standard Elasticsearch (805 B/record)</span>
           </div>
-          <div class="logs-bar-item">
-            <div class="logs-bar-label"><span>ClickHouse baseline</span><strong>153 B</strong></div>
-            <div class="logs-bar-track"><div class="logs-bar-fill fill-teal" style="width:19%"></div></div>
-          </div>
-          <div class="logs-bar-item">
-            <div class="logs-bar-label"><span style="color:var(--blue);font-weight:700;">Elastic columnar target</span><strong style="color:var(--blue)">~150 B</strong></div>
-            <div class="logs-bar-track" style="background:rgba(0,119,204,.15)"><div class="logs-bar-fill fill-blue" style="width:18.5%;opacity:.5;border: 1px dashed var(--blue);"></div></div>
+          <div class="logs-stat-row">
+            <span class="logs-stat-num">Near parity</span>
+            <span class="logs-stat-desc">with best-in-class columnar stores — before full columnar mode</span>
           </div>
         </div>
-        <div class="logs-coming">
-          <p><strong>Columnar logs</strong> are in active development. The doc-values-only configuration today is already within 10% of ClickHouse storage efficiency — full columnar mode will close that gap entirely.</p>
+        <span class="logs-feat-coming">Full columnar logs will close the gap entirely</span>
+      </div>
+
+      <!-- QUERY LATENCY TRAJECTORY -->
+      <div class="logs-feature-card">
+        <div class="logs-feat-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="14" fill="#EBF4FF"/>
+            <polyline points="10,36 18,24 24,29 32,16 38,20" stroke="#0077CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="10,36 18,30 24,33 32,24 38,27" stroke="#00BFB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="3 2"/>
+          </svg>
         </div>
+        <div class="logs-feat-tag">ES 9.4</div>
+        <h3>Query Latency: ~40% faster since Jan 2026</h3>
+        <p>Three focused engineering investments have compounded across 9.x to dramatically cut average query execution time — and each improvement stacks on the last.</p>
+        <div class="logs-improvements">
+          <div class="logs-improvement-row">
+            <div class="logs-imp-label">LuceneSource DOC Partitioning</div>
+            <div class="logs-imp-bar-track"><div class="logs-imp-bar" style="width:100%"></div></div>
+            <div class="logs-imp-num">3x avg</div>
+          </div>
+          <div class="logs-improvement-row">
+            <div class="logs-imp-label">Skipper competitive iterator</div>
+            <div class="logs-imp-bar-track"><div class="logs-imp-bar" style="width:85%"></div></div>
+            <div class="logs-imp-num">11x avg</div>
+          </div>
+          <div class="logs-improvement-row">
+            <div class="logs-imp-label">Swiss hashtables</div>
+            <div class="logs-imp-bar-track"><div class="logs-imp-bar" style="width:38%"></div></div>
+            <div class="logs-imp-num">1.4x avg</div>
+          </div>
+          <div class="logs-improvement-row">
+            <div class="logs-imp-label">Wildcard query rewrite</div>
+            <div class="logs-imp-bar-track"><div class="logs-imp-bar" style="width:52%"></div></div>
+            <div class="logs-imp-num">3.3x avg</div>
+          </div>
+        </div>
+        <div class="logs-summary-badge">~40% faster average query time since Jan 2026</div>
       </div>
 
     </div>
