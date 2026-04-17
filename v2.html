@@ -983,6 +983,237 @@
   </div>
 </section>
 
+<!-- ═══ GENERATIVE OBSERVABILITY ════════════════════════════════════ -->
+<style>
+  .genobs-section { background: var(--white); padding: 88px 40px; border-top: 1px solid var(--border); }
+
+  .surfaces-row {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+  .surface-card {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    border: 1.5px solid var(--border); border-radius: 14px;
+    padding: 20px 24px; min-width: 140px; text-align: center;
+    background: var(--white); transition: box-shadow .2s, border-color .2s;
+  }
+  .surface-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); border-color: var(--blue); }
+  .surface-card-icon { font-size: 26px; }
+  .surface-card-title { font-size: 13px; font-weight: 800; color: var(--dark); line-height: 1.3; }
+  .surface-card-verb { font-size: 11px; color: var(--muted); font-style: italic; }
+  .surface-card.s-kibana  { border-color: #93C5FD; }
+  .surface-card.s-chat    { border-color: #C4B5FD; }
+  .surface-card.s-cli     { border-color: var(--border); }
+  .surface-card.s-agent   { border-color: #6EE7B7; }
+  .surface-card.s-api     { border-color: #6EE7B7; }
+
+  .skills-box {
+    border: 2px solid #FED7AA; border-radius: 20px;
+    background: #FFF7ED; padding: 32px 36px; margin-bottom: 56px;
+  }
+  .skills-box-title { text-align: center; font-size: 18px; font-weight: 800; color: #C2410C; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .skills-box-sub   { text-align: center; font-size: 13px; color: #9A3412; font-style: italic; margin-bottom: 24px; }
+  .skills-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:700px) { .skills-inner { grid-template-columns: 1fr; } }
+  .skills-col { background: var(--white); border-radius: 12px; padding: 18px 20px; }
+  .skills-col-title { font-size: 13px; font-weight: 800; color: #C2410C; margin-bottom: 12px; }
+  .skills-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mid); margin-bottom: 8px; }
+  .skills-dot { width: 6px; height: 6px; border-radius: 50%; background: #F97316; min-width: 6px; }
+  .skills-reuse { text-align: center; margin-top: 12px; font-size: 12px; font-weight: 800; color: #C2410C; }
+
+  /* MCP / Claude mockup */
+  .genobs-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  @media(max-width:900px) { .genobs-bottom { grid-template-columns: 1fr; } }
+
+  .mcp-mockup {
+    background: #1C1C1E; border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 24px 64px rgba(0,0,0,.3);
+  }
+  .mcp-bar {
+    background: #2C2C2E; padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .mcp-bar-title { font-size: 12px; color: rgba(255,255,255,.5); margin-left: 8px; flex: 1; text-align: center; }
+  .mcp-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  .mcp-user-msg {
+    align-self: flex-end; max-width: 80%;
+    background: #3A3A3C; border-radius: 14px 14px 4px 14px;
+    padding: 10px 14px; font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.5;
+  }
+  .mcp-tool-call {
+    font-size: 12px; color: rgba(255,255,255,.4);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mcp-tool-call-name { color: rgba(255,255,255,.6); font-weight: 600; }
+  .mcp-response { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.6; }
+
+  .mcp-anomaly-card {
+    background: #2C2C2E; border-radius: 12px; padding: 14px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .mcp-anomaly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .mcp-anomaly-type { font-size: 11px; color: rgba(255,255,255,.4); }
+  .mcp-anomaly-crit { background: #DC2626; color: white; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 100px; letter-spacing: .04em; }
+  .mcp-anomaly-pod { font-size: 14px; font-weight: 800; color: var(--white); margin-bottom: 2px; }
+  .mcp-anomaly-meta { font-size: 11px; color: rgba(255,255,255,.4); margin-bottom: 12px; }
+  .mcp-anomaly-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .mcp-stat { background: #1C1C1E; border-radius: 8px; padding: 8px 10px; }
+  .mcp-stat-label { font-size: 10px; color: rgba(255,255,255,.35); margin-bottom: 2px; }
+  .mcp-stat-val { font-size: 15px; font-weight: 800; }
+  .mcp-stat-val.red { color: #F87171; }
+  .mcp-stat-val.white { color: var(--white); }
+  .mcp-stat-val.muted { color: rgba(255,255,255,.6); }
+  .mcp-stat-val.pos { color: #F87171; }
+  .mcp-stat-sub { font-size: 10px; color: rgba(255,255,255,.3); }
+</style>
+
+<section class="genobs-section">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:48px;">
+      <span class="section-label">Generative Observability</span>
+      <h2 class="section-title"><strong>Observability everywhere</strong><br>you already work.</h2>
+      <p class="section-sub" style="margin-bottom:0;">The same Skills engine — the same KIs, Significant Events, and remediations — rendered on any surface. Kibana for your SRE team. Claude for your on-call engineer. CLI for your automation pipeline. The data is the same. The interface is yours.</p>
+    </div>
+
+    <!-- 5 interaction surfaces -->
+    <div class="surfaces-row">
+      <div class="surface-card s-kibana">
+        <div class="surface-card-icon">🖥️</div>
+        <div class="surface-card-title">Kibana / UI</div>
+        <div class="surface-card-verb">Validate</div>
+      </div>
+      <div class="surface-card s-chat">
+        <div class="surface-card-icon">💬</div>
+        <div class="surface-card-title">Chat / Agent Builder</div>
+        <div class="surface-card-verb">Explore</div>
+      </div>
+      <div class="surface-card s-cli">
+        <div class="surface-card-icon" style="font-family:monospace;font-size:20px;font-weight:800;">›_</div>
+        <div class="surface-card-title">CLI / Terminal</div>
+        <div class="surface-card-verb">Operate</div>
+      </div>
+      <div class="surface-card s-agent">
+        <div class="surface-card-icon">🤖</div>
+        <div class="surface-card-title">Agent Harness / External</div>
+        <div class="surface-card-verb">Automate</div>
+      </div>
+      <div class="surface-card s-api">
+        <div class="surface-card-icon">⚡</div>
+        <div class="surface-card-title">API / Automation</div>
+        <div class="surface-card-verb">Integrate</div>
+      </div>
+    </div>
+
+    <!-- Skills layer -->
+    <div class="skills-box">
+      <div class="skills-box-title">🗂 Skills — Execution and Rendering Layer</div>
+      <div class="skills-box-sub">Defines what to compute and how to present it</div>
+      <div class="skills-inner">
+        <div class="skills-col">
+          <div class="skills-col-title">Skills define:</div>
+          <div class="skills-item"><div class="skills-dot"></div>Data Access (ES|QL, APIs)</div>
+          <div class="skills-item"><div class="skills-dot"></div>System Understanding (KIs, dependencies, state)</div>
+          <div class="skills-item"><div class="skills-dot"></div>Event Analysis (Events, Significant Events)</div>
+          <div class="skills-item"><div class="skills-dot"></div>Content Generation (dashboards, alerts, SLOs)</div>
+          <div class="skills-item"><div class="skills-dot"></div>Remediation Actions</div>
+        </div>
+        <div class="skills-col">
+          <div class="skills-col-title">Rendering logic:</div>
+          <div class="skills-item"><div class="skills-dot"></div>Domain best practices — CPU, memory, Kubernetes, databases</div>
+          <div class="skills-item"><div class="skills-dot"></div>Surface-aware rendering — UI, chat, CLI, agent</div>
+          <div class="skills-reuse" style="margin-top:16px;">✦ Reusable everywhere</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: text + MCP Claude mockup -->
+    <div class="genobs-bottom">
+      <div>
+        <span class="section-label">MCP Integration</span>
+        <h3 style="font-size:clamp(22px,3vw,34px);font-weight:800;line-height:1.2;letter-spacing:-.02em;color:var(--dark);margin-bottom:16px;">Ask Claude about<br><strong style="color:var(--blue);">your production system.</strong></h3>
+        <p style="font-size:16px;color:var(--muted);line-height:1.7;margin-bottom:28px;">With the Elastic MCP server, Claude becomes your observability co-pilot. Ask it to detect anomalies, surface Significant Events, or explain what's happening in your cluster — in plain language, right inside your existing workflow.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--light);display:flex;align-items:center;justify-content:center;min-width:30px;font-size:14px;">🔌</div>
+            <div><strong style="font-size:14px;color:var(--dark);">Native MCP server</strong><br><span style="font-size:13px;color:var(--muted);">Connect any Claude-compatible client directly to your Elastic cluster.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--light);display:flex;align-items:center;justify-content:center;min-width:30px;font-size:14px;">🧠</div>
+            <div><strong style="font-size:14px;color:var(--dark);">Skills loaded automatically</strong><br><span style="font-size:13px;color:var(--muted);">Significant Events RCA, anomaly detection, and remediation — always available.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--light);display:flex;align-items:center;justify-content:center;min-width:30px;font-size:14px;">🎨</div>
+            <div><strong style="font-size:14px;color:var(--dark);">Surface-aware rendering</strong><br><span style="font-size:13px;color:var(--muted);">Results rendered as rich cards, not raw JSON — built for the interface you're using.</span></div>
+          </div>
+        </div>
+        <a href="#" class="btn btn-primary btn-lg">Get the MCP server</a>
+      </div>
+
+      <!-- Claude / MCP anomaly mockup -->
+      <div class="mcp-mockup">
+        <div class="mcp-bar">
+          <div class="term-dot term-dot-r"></div>
+          <div class="term-dot term-dot-y"></div>
+          <div class="term-dot term-dot-g"></div>
+          <div class="mcp-bar-title">K8s-Agentic-Investigation — Claude</div>
+        </div>
+        <div class="mcp-body">
+          <div class="mcp-user-msg">Call forge_ml_anomalies with entity "frontend" and lookback "1h". Ignore the chaos* anomalies. Show the results using the anomaly-explainer app.</div>
+          <div class="mcp-tool-call">
+            <span>›</span>
+            <span class="mcp-tool-call-name">forge_ml_anomalies</span>
+            <span style="color:rgba(255,255,255,.3);">entity: frontend · lookback: 1h</span>
+          </div>
+          <div class="mcp-response">Got the data. Now let me render it in the anomaly-explainer app.</div>
+
+          <div class="mcp-anomaly-card">
+            <div class="mcp-anomaly-header">
+              <span class="mcp-anomaly-type">k8s-pod-memory-growth</span>
+              <span class="mcp-anomaly-crit">critical</span>
+            </div>
+            <div class="mcp-anomaly-pod">frontend-7847f66d84-27cfw</div>
+            <div class="mcp-anomaly-meta">oteldemo-esyox-default · mean(metrics.k8s.pod.memory.working_set)</div>
+            <div class="mcp-anomaly-stats">
+              <div class="mcp-stat">
+                <div class="mcp-stat-label">Anomaly score</div>
+                <div class="mcp-stat-val red">96.2</div>
+                <div class="mcp-stat-sub">out of 100</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat-label">Actual memory</div>
+                <div class="mcp-stat-val white">104.5 MB</div>
+                <div class="mcp-stat-sub">working set</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat-label">Typical memory</div>
+                <div class="mcp-stat-val muted">75.5 MB</div>
+                <div class="mcp-stat-sub">learned baseline</div>
+              </div>
+              <div class="mcp-stat">
+                <div class="mcp-stat-label">Deviation</div>
+                <div class="mcp-stat-val pos">+38.4%</div>
+                <div class="mcp-stat-sub">above baseline</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:rgba(255,255,255,.35);display:flex;justify-content:space-between;padding:0 2px;">
+            <span>Typical (75.5 MB)</span>
+            <span>Actual (104.5 MB)</span>
+          </div>
+          <div style="height:4px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;">
+            <div style="width:72%;height:100%;background:rgba(248,113,113,.6);border-radius:100px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ═══ LOGS SECTION ════════════════════════════════════════════════ -->
 <style>
   .logs-three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
