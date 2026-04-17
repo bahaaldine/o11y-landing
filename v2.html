@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elastic Observability — The platform fast enough to power agentic AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #0077CC;
+      --blue-dk: #005fa3;
+      --teal:    #00BFB3;
+      --teal-dk: #00a29a;
+      --navy:    #07101F;
+      --dark:    #1D1D1D;
+      --mid:     #343741;
+      --muted:   #69707D;
+      --border:  #D3DAE6;
+      --light:   #F1F4FA;
+      --white:   #FFFFFF;
+      --font:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body { font-family: var(--font); color: var(--dark); background: var(--white); -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; }
+
+    /* ── NAV ───────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 64px;
+    }
+    .nav-logo { display: flex; align-items: center; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 14px; font-weight: 500; color: var(--mid); transition: color .15s; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 14px; font-weight: 600; padding: 10px 22px; cursor: pointer; transition: all .15s; border: none; }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-outline { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
+    .btn-outline:hover { background: rgba(0,119,204,.06); }
+    .btn-teal { background: var(--teal); color: var(--white); }
+    .btn-teal:hover { background: var(--teal-dk); }
+    .btn-ghost-dark { background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.25); }
+    .btn-lg { padding: 14px 32px; font-size: 16px; border-radius: 8px; }
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #07101F 0%, #0d1f3c 55%, #0a2240 100%);
+      color: var(--white); padding: 100px 40px 88px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% -5%, rgba(0,191,179,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,191,179,.15); border: 1px solid rgba(0,191,179,.35);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 12px; font-weight: 700; color: var(--teal);
+      letter-spacing: .08em; text-transform: uppercase; margin-bottom: 28px;
+    }
+    .hero-eyebrow::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--teal); }
+    .hero h1 {
+      font-size: clamp(38px, 5.5vw, 64px); font-weight: 800;
+      line-height: 1.1; letter-spacing: -.025em;
+      max-width: 900px; margin: 0 auto 24px;
+    }
+    .hero h1 em { font-style: normal; color: var(--teal); }
+    .hero p {
+      font-size: 19px; color: rgba(255,255,255,.72); line-height: 1.65;
+      max-width: 600px; margin: 0 auto 44px;
+    }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── AGENTIC VISION ────────────────────────────────────── */
+    .agentic-section {
+      background: var(--white);
+      padding: 88px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 800;
+      line-height: 1.14; letter-spacing: -.02em; color: var(--dark); margin-bottom: 14px;
+    }
+    .section-title strong { color: var(--blue); }
+    .section-sub {
+      font-size: 17px; color: var(--muted); line-height: 1.65;
+      max-width: 620px; margin: 0 auto 56px;
+    }
+
+    .agentic-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      background: var(--border); border-radius: 20px; overflow: hidden;
+    }
+    @media(max-width:860px) { .agentic-grid { grid-template-columns: 1fr; } }
+
+    .agentic-card {
+      background: var(--white); padding: 44px 40px 48px;
+      display: flex; flex-direction: column; gap: 20px;
+      position: relative;
+    }
+    .agentic-card:first-child { border-radius: 20px 0 0 20px; }
+    .agentic-card:last-child  { border-radius: 0 20px 20px 0; }
+
+    .agentic-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      width: fit-content; border-radius: 100px; padding: 5px 14px;
+      font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .tag-yellow { background: #FEF3C7; color: #92400E; }
+    .tag-blue   { background: #DBEAFE; color: #1E40AF; }
+    .tag-coral  { background: #FFE4E1; color: #9B1C1C; }
+
+    .agentic-card h3 {
+      font-size: 24px; font-weight: 800; line-height: 1.2; color: var(--dark);
+    }
+    .agentic-items { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .agentic-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 15px; color: var(--mid); line-height: 1.5;
+    }
+    .agentic-item-dot {
+      width: 6px; height: 6px; border-radius: 50%; min-width: 6px; margin-top: 7px;
+    }
+    .dot-yellow { background: #D97706; }
+    .dot-blue   { background: var(--blue); }
+    .dot-coral  { background: #EF4444; }
+    .agentic-item b { color: var(--dark); }
+
+    .agentic-footer {
+      border-top: 1px solid var(--border); padding-top: 20px; margin-top: 4px;
+      font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .footer-yellow { color: #D97706; }
+    .footer-blue   { color: var(--blue); }
+    .footer-coral  { color: #EF4444; }
+
+    /* arrow between cards */
+    .agentic-arrow {
+      position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue); color: white; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+
+    /* ── METRICS BENCH ─────────────────────────────────────── */
+    .perf-section { background: var(--light); padding: 80px 40px; }
+
+    .perf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    @media(max-width:900px) { .perf-grid { grid-template-columns: 1fr; } }
+
+    .perf-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .perf-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.12); transform: translateY(-3px); }
+    .perf-card-icon { padding: 32px 32px 0; display: flex; align-items: center; justify-content: center; height: 110px; }
+    .perf-card-icon svg { width: 64px; height: 64px; }
+    .perf-card-header { background: var(--blue); margin: 20px 0 0; padding: 13px 28px; font-size: 15px; font-weight: 700; color: var(--white); }
+    .perf-card-body { padding: 22px 28px; flex: 1; }
+    .perf-stat { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+    .perf-stat-num { font-size: 28px; font-weight: 800; color: var(--dark); }
+    .perf-stat-label { font-size: 14px; color: var(--muted); }
+    .perf-vs { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+    .perf-vs-row { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--mid); }
+    .perf-vs-pill {
+      display: inline-flex; align-items: center;
+      background: rgba(0,191,179,.12); border-radius: 100px;
+      padding: 3px 10px; font-size: 13px; font-weight: 700; color: var(--teal-dk); white-space: nowrap;
+    }
+    .perf-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .why-label { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+    .why-text { font-size: 14px; color: var(--mid); line-height: 1.6; }
+    .perf-card-footer {
+      padding: 14px 28px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .badge-ga { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #00875A; display: flex; align-items: center; gap: 5px; }
+    .badge-ga::before { content:''; width:7px; height:7px; border-radius:50%; background:#00875A; }
+    .badge-preview { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--blue); display: flex; align-items: center; gap: 5px; }
+    .badge-preview::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--blue); }
+    .blazing-banner {
+      flex: 1; background: linear-gradient(90deg, var(--blue) 0%, #004e99 100%);
+      border-radius: 8px; padding: 10px 16px;
+      text-align: center; font-size: 13px; font-weight: 700; color: var(--white);
+    }
+
+    /* ── AI INVESTIGATION ──────────────────────────────────── */
+    .ai-section { background: var(--navy); padding: 88px 40px; }
+    .ai-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    @media(max-width:900px) { .ai-inner { grid-template-columns: 1fr; } }
+
+    .ai-label { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; }
+    .ai-title { font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; line-height: 1.14; letter-spacing: -.02em; color: var(--white); margin-bottom: 20px; }
+    .ai-title em { font-style: normal; color: var(--teal); }
+    .ai-body { font-size: 17px; color: rgba(255,255,255,.68); line-height: 1.7; margin-bottom: 36px; }
+
+    .ai-features { display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; }
+    .ai-feature { display: flex; gap: 16px; }
+    .ai-feature-icon {
+      width: 36px; height: 36px; min-width: 36px; border-radius: 10px;
+      background: rgba(0,191,179,.15); display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .ai-feature-text h4 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .ai-feature-text p  { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.55; }
+
+    /* Terminal mockup */
+    .terminal {
+      background: #0D1117; border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.1);
+      overflow: hidden; font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .terminal-bar {
+      background: #1C2128; padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot-r { background: #FF5F57; }
+    .term-dot-y { background: #FFBD2E; }
+    .term-dot-g { background: #28C840; }
+    .term-title { font-size: 12px; color: rgba(255,255,255,.4); margin-left: 8px; }
+    .terminal-body { padding: 24px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 1.6; }
+    .t-prompt { color: #7EE787; }
+    .t-input  { color: rgba(255,255,255,.85); }
+    .t-system { color: rgba(255,255,255,.4); font-style: italic; }
+    .t-incident { color: #FF7B72; font-weight: 700; }
+    .t-detail { color: rgba(255,255,255,.6); padding-left: 12px; }
+    .t-action { color: #79C0FF; }
+    .t-check  { color: #7EE787; }
+    .t-resolved { color: var(--teal); font-weight: 800; font-size: 14px; margin-top: 4px; }
+    .t-line   { border-top: 1px solid rgba(255,255,255,.08); margin: 4px 0; }
+
+    /* ── LOGS SECTION ──────────────────────────────────────── */
+    .logs-section { background: var(--white); padding: 88px 40px; border-top: 1px solid var(--border); }
+    .logs-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    @media(max-width:900px) { .logs-inner { grid-template-columns: 1fr; } }
+
+    .logs-title { font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; line-height: 1.14; letter-spacing: -.02em; color: var(--dark); margin-bottom: 16px; }
+    .logs-title strong { color: var(--blue); }
+    .logs-body { font-size: 17px; color: var(--muted); line-height: 1.7; margin-bottom: 36px; }
+
+    .logs-pillars { display: flex; flex-direction: column; gap: 16px; }
+    .logs-pillar {
+      background: var(--light); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 24px; display: flex; align-items: center; gap: 20px;
+    }
+    .pillar-icon {
+      width: 48px; height: 48px; min-width: 48px; border-radius: 12px;
+      background: var(--white); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pillar-icon svg { width: 26px; height: 26px; }
+    .pillar-content h4 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .pillar-content p  { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .pillar-target {
+      margin-left: auto; font-size: 13px; font-weight: 800; color: var(--blue);
+      white-space: nowrap; background: rgba(0,119,204,.08); border-radius: 100px; padding: 4px 12px;
+    }
+
+    .logs-visual {
+      background: var(--light); border: 1px solid var(--border); border-radius: 20px; padding: 32px;
+    }
+    .logs-vis-title { font-size: 14px; font-weight: 700; color: var(--mid); margin-bottom: 24px; }
+    .logs-bar-row { display: flex; flex-direction: column; gap: 14px; }
+    .logs-bar-item {}
+    .logs-bar-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    .logs-bar-label strong { color: var(--dark); font-weight: 700; }
+    .logs-bar-track { height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .logs-bar-fill { height: 100%; border-radius: 100px; }
+    .fill-teal { background: var(--teal); }
+    .fill-blue { background: var(--blue); }
+    .fill-muted { background: #B0BAC5; }
+    .logs-coming { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .logs-coming p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .logs-coming strong { color: var(--dark); }
+
+    /* ── MIGRATION ─────────────────────────────────────────── */
+    .migration-section { background: var(--navy); color: var(--white); padding: 88px 40px; }
+    .migration-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    @media(max-width:860px) { .migration-inner { grid-template-columns: 1fr; } }
+    .migration-label { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; }
+    .migration-title { font-size: clamp(28px, 3.5vw, 42px); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 20px; }
+    .migration-title em { font-style: normal; color: var(--teal); }
+    .migration-body { font-size: 17px; color: rgba(255,255,255,.7); line-height: 1.7; margin-bottom: 32px; }
+    .migration-steps { display: flex; flex-direction: column; gap: 20px; margin-bottom: 36px; }
+    .migration-step { display: flex; gap: 16px; align-items: flex-start; }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%; min-width: 32px;
+      background: var(--teal); color: var(--navy);
+      font-size: 13px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-text h4 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .step-text p  { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.55; }
+    .migration-panel {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px; padding: 32px;
+    }
+    .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .panel-logo { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .panel-title { font-size: 16px; font-weight: 700; color: var(--white); }
+    .panel-sub   { font-size: 13px; color: rgba(255,255,255,.5); }
+    .panel-items { display: flex; flex-direction: column; gap: 12px; }
+    .panel-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; padding: 12px 16px;
+    }
+    .panel-item-left { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--white); }
+    .panel-item-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 100px; letter-spacing: .04em; }
+    .badge-migrated { background: rgba(0,191,179,.15); color: var(--teal); }
+    .badge-ready    { background: rgba(0,119,204,.15); color: #4fa9e8; }
+    .migration-progress { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; gap: 16px; }
+    .progress-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,.1); border-radius: 100px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 100%; background: var(--teal); border-radius: 100px; }
+    .progress-label { font-size: 13px; font-weight: 700; color: var(--teal); white-space: nowrap; }
+
+    /* ── CAPABILITY GRID ───────────────────────────────────── */
+    .cap-section { padding: 80px 40px; background: var(--light); }
+    .cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    @media(max-width:900px) { .cap-grid { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:600px) { .cap-grid { grid-template-columns: 1fr; } }
+    .cap-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+    .cap-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--light); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+    .cap-icon svg { width: 26px; height: 26px; }
+    .cap-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--dark); }
+    .cap-card p  { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .cap-link { font-size: 13px; font-weight: 700; color: var(--blue); display: inline-flex; align-items: center; gap: 5px; }
+    .cap-link::after { content:'→'; }
+    .cap-link:hover { text-decoration: underline; }
+
+    /* ── CTA ───────────────────────────────────────────────── */
+    .cta-section { padding: 80px 40px; background: var(--white); }
+    .cta-box {
+      background: linear-gradient(135deg, #07101F 0%, #0d1f3c 100%);
+      border-radius: 24px; padding: 64px 56px; text-align: center; color: var(--white);
+      position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse 60% 60% at 50% -10%, rgba(0,191,179,.2) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .cta-box h2 { font-size: clamp(26px, 3.5vw, 42px); font-weight: 800; margin-bottom: 16px; letter-spacing: -.02em; }
+    .cta-box p  { font-size: 17px; color: rgba(255,255,255,.7); line-height: 1.65; margin-bottom: 36px; max-width: 540px; margin-left: auto; margin-right: auto; }
+    .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 48px 40px 32px; border-top: 1px solid rgba(255,255,255,.08); }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 40px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 40px; }
+    .footer-col h4 { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.85); margin-bottom: 16px; letter-spacing: .04em; text-transform: uppercase; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a { font-size: 14px; color: rgba(255,255,255,.55); transition: color .15s; }
+    .footer-col ul li a:hover { color: var(--teal); }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-bottom p { font-size: 13px; }
+    .footer-logo { font-size: 18px; font-weight: 800; color: rgba(255,255,255,.85); }
+
+    /* section util */
+    .text-center { text-align: center; }
+    .mb-56 { margin-bottom: 56px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-logo">
+    <img src="elastic-logo.svg" alt="Elastic" style="height:28px;width:auto;" />
+  </div>
+  <div class="nav-links">
+    <a href="#">Solutions</a>
+    <a href="#">Elasticsearch</a>
+    <a href="#">Pricing</a>
+    <a href="#">Docs</a>
+    <a href="#">Blog</a>
+  </div>
+  <div class="nav-cta">
+    <a href="#" class="btn btn-outline">Contact sales</a>
+    <a href="#" class="btn btn-primary">Start free trial</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-eyebrow">Elasticsearch 9.4 — Now GA</div>
+  <h1>The platform <em>fast enough</em><br>to power agentic AI.</h1>
+  <p>Observability that doesn't just collect data — it understands your system, discovers what matters, and acts. Built on the fastest metrics engine in its class.</p>
+  <div class="hero-actions">
+    <a href="#" class="btn btn-teal btn-lg">Start free trial</a>
+    <a href="#" class="btn btn-ghost-dark btn-lg">Watch demo</a>
+  </div>
+</section>
+
+<!-- ═══ AGENTIC VISION ══════════════════════════════════════════════ -->
+<section class="agentic-section">
+  <div class="container">
+    <div class="text-center mb-56">
+      <span class="section-label">The Elastic Observability Vision</span>
+      <h2 class="section-title">Telemetry is only the beginning.<br><strong>AI takes it from there.</strong></h2>
+      <p class="section-sub">Turning raw signals into relevant context, automated workflows, and agentic actions — so your team fixes problems before customers notice.</p>
+    </div>
+
+    <div class="agentic-grid">
+
+      <!-- KNOWLEDGE -->
+      <div class="agentic-card">
+        <div class="agentic-tag tag-yellow">Context</div>
+        <h3>AI can understand the system</h3>
+        <div class="agentic-items">
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-yellow"></div>
+            <span><b>Unify</b> logs, metrics, and traces automatically</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-yellow"></div>
+            <span><b>Enrich</b> with topology, dependencies, and metadata</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-yellow"></div>
+            <span><b>Infer</b> knowledge from telemetry — no config toil</span>
+          </div>
+        </div>
+        <div class="agentic-footer footer-yellow">Knowledge</div>
+        <div class="agentic-arrow">→</div>
+      </div>
+
+      <!-- AUTOMATION -->
+      <div class="agentic-card">
+        <div class="agentic-tag tag-blue">Workflow</div>
+        <h3>AI can drive the process</h3>
+        <div class="agentic-items">
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-blue"></div>
+            <span><b>Discover</b> significant events before they become outages</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-blue"></div>
+            <span><b>Guide</b> investigations with agentic RCA</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-blue"></div>
+            <span><b>Automate</b> runbooks based on operational knowledge</span>
+          </div>
+        </div>
+        <div class="agentic-footer footer-blue">Automation</div>
+        <div class="agentic-arrow">→</div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="agentic-card">
+        <div class="agentic-tag tag-coral">Agentic</div>
+        <h3>AI can act on behalf of your team</h3>
+        <div class="agentic-items">
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-coral"></div>
+            <span><b>Automated RCA</b> — root cause in seconds, not hours</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-coral"></div>
+            <span><b>Propose fixes</b> with confidence scores and blast radius</span>
+          </div>
+          <div class="agentic-item">
+            <div class="agentic-item-dot dot-coral"></div>
+            <span><b>Trigger safe actions</b> — autonomous or human-in-the-loop</span>
+          </div>
+        </div>
+        <div class="agentic-footer footer-coral">Actions</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ METRICS BENCHMARKS ═════════════════════════════════════════ -->
+<section class="perf-section">
+  <div class="container">
+    <div class="text-center mb-56">
+      <span class="section-label">Elasticsearch 9.4 Benchmarks</span>
+      <h2 class="section-title"><strong>Best in Class Efficiency</strong> for Metrics</h2>
+      <p class="section-sub">Agentic AI is only as good as the data platform powering it. Here's why ours is built different.</p>
+    </div>
+
+    <div class="perf-grid">
+      <!-- QUERY -->
+      <div class="perf-card">
+        <div class="perf-card-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#EBF4FF"/>
+            <path d="M18 44L30 22l12 22" stroke="#0077CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 38h16" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="46" cy="24" r="7" stroke="#00BFB3" stroke-width="2.5"/>
+            <path d="M51 29l4 4" stroke="#00BFB3" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="perf-card-header">Blazing Fast Query Performance</div>
+        <div class="perf-card-body">
+          <div class="perf-stat">
+            <span class="perf-stat-num">5–25x</span>
+            <span class="perf-stat-label">faster than competitors</span>
+          </div>
+          <div class="perf-vs">
+            <div class="perf-vs-row"><span class="perf-vs-pill">up to 25x faster</span><span>vs Prometheus</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">up to 25x faster</span><span>vs Mimir</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">matches</span><span>ClickHouse</span></div>
+          </div>
+          <div class="perf-divider"></div>
+          <div class="why-label">Why it matters:</div>
+          <p class="why-text">ES|QL delivers sub-second responses on millions of time series — the speed your AI investigation agents demand.</p>
+        </div>
+        <div class="perf-card-footer">
+          <span class="badge-ga">GA</span>
+          <div class="blazing-banner">Blazing fast: 5x–25x vs Prom, Mimir</div>
+        </div>
+      </div>
+
+      <!-- STORAGE -->
+      <div class="perf-card">
+        <div class="perf-card-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#E6FAF9"/>
+            <ellipse cx="32" cy="22" rx="16" ry="6" stroke="#00BFB3" stroke-width="2.5"/>
+            <path d="M16 22v10c0 3.3 7.2 6 16 6s16-2.7 16-6V22" stroke="#00BFB3" stroke-width="2.5"/>
+            <path d="M16 32v10c0 3.3 7.2 6 16 6s16-2.7 16-6V32" stroke="#0077CC" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="perf-card-header">Significant Storage Efficiency Gain</div>
+        <div class="perf-card-body">
+          <div class="perf-stat">
+            <span class="perf-stat-num">3.74</span>
+            <span class="perf-stat-label">bytes/sample</span>
+          </div>
+          <div class="perf-vs">
+            <div class="perf-vs-row"><span class="perf-vs-pill">6.6x vs ES 8.x</span><span>overall improvement</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">2.5x better</span><span>vs Prometheus</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">1.8x better</span><span>vs ClickHouse</span></div>
+          </div>
+          <div class="perf-divider"></div>
+          <div class="why-label">Why it matters:</div>
+          <p class="why-text">Synthetic ID and seq_no trimming cut storage from 10.8 → 3.74 bytes/sample. Store more history for richer AI context at lower cost.</p>
+        </div>
+        <div class="perf-card-footer">
+          <span class="badge-ga">GA in 9.4</span>
+        </div>
+      </div>
+
+      <!-- INGEST -->
+      <div class="perf-card">
+        <div class="perf-card-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="#EBF4FF"/>
+            <path d="M16 32h16m0 0l-5-5m5 5l-5 5" stroke="#0077CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M36 22h8a4 4 0 014 4v12a4 4 0 01-4 4h-8" stroke="#0077CC" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="10" y="19" width="12" height="9" rx="3" stroke="#00BFB3" stroke-width="2.5"/>
+            <rect x="10" y="34" width="12" height="9" rx="3" stroke="#00BFB3" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="perf-card-header">Prometheus-native Ingest & PromQL</div>
+        <div class="perf-card-body">
+          <div class="perf-stat">
+            <span class="perf-stat-num">428K</span>
+            <span class="perf-stat-label">samples/sec</span>
+          </div>
+          <div class="perf-vs">
+            <div class="perf-vs-row"><span class="perf-vs-pill">on par</span><span>with Mimir (404K)</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">on par</span><span>with Prometheus (402K)</span></div>
+            <div class="perf-vs-row"><span class="perf-vs-pill">1.4x better</span><span>vs ClickHouse</span></div>
+          </div>
+          <div class="perf-divider"></div>
+          <div class="why-label">Why it matters:</div>
+          <p class="why-text">Direct ingest into Elasticsearch with native PromQL support. Engineers living in Grafana feel right at home — zero friction to switch.</p>
+        </div>
+        <div class="perf-card-footer">
+          <span class="badge-preview">Tech Preview</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AI INVESTIGATION ════════════════════════════════════════════ -->
+<section class="ai-section">
+  <div class="container">
+    <div class="ai-inner">
+      <div>
+        <div class="ai-label">AI-Driven Investigation</div>
+        <h2 class="ai-title">From alert to fix<br>in <em>under 3 minutes.</em></h2>
+        <p class="ai-body">Elastic's agentic investigation engine correlates raw events, determines blast radius, identifies root cause, and proposes executable remediations — all before your on-call engineer finishes reading the alert.</p>
+
+        <div class="ai-features">
+          <div class="ai-feature">
+            <div class="ai-feature-icon">🔍</div>
+            <div class="ai-feature-text">
+              <h4>Discover Significant Events</h4>
+              <p>Correlates OOM exceptions, latency spikes, pod restarts, and error spikes into a single coherent operational situation.</p>
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">⚡</div>
+            <div class="ai-feature-text">
+              <h4>Automated Root Cause Analysis</h4>
+              <p>85% confidence scoring with blast radius analysis across services, dependencies, and downstream APIs.</p>
+            </div>
+          </div>
+          <div class="ai-feature">
+            <div class="ai-feature-icon">🛡️</div>
+            <div class="ai-feature-text">
+              <h4>Human-in-the-Loop Remediation</h4>
+              <p>Autonomous execution for high-confidence fixes, or operator review for anything that needs a human call.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="#" class="btn btn-teal btn-lg">See it in action</a>
+          <a href="#" class="btn btn-ghost-dark btn-lg">Learn more</a>
+        </div>
+      </div>
+
+      <!-- CLI Terminal -->
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="term-dot term-dot-r"></div>
+          <div class="term-dot term-dot-y"></div>
+          <div class="term-dot term-dot-g"></div>
+          <span class="term-title">elastic-agent — production cluster</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">$</span> <span class="t-input">elastic --namespace production</span></div>
+          <div class="t-system">› Connecting to cluster...</div>
+          <div class="t-system">› Fetching Significant Events...</div>
+          <div class="t-line"></div>
+          <div class="t-incident">⚠ INCIDENT · HIGH — payment-service</div>
+          <div class="t-detail">cause: Redis OOM · error_rate ↑94% · p99 ↑8.4s</div>
+          <div class="t-detail">blast radius: payment → checkout → orders</div>
+          <div class="t-detail">confidence: 85% · 3 services · 12 pods affected</div>
+          <div class="t-line"></div>
+          <div><span class="t-system">› Root cause identified: DB connection pool exhaustion</span></div>
+          <div><span class="t-system">› Proposing remediation plan...</span></div>
+          <div class="t-line"></div>
+          <div><span class="t-prompt">›</span> <span class="t-input">run remediation (auto)</span></div>
+          <div class="t-action">  kubectl rollout restart  <span class="t-check">✓</span>  (23s)</div>
+          <div class="t-action">  redis CONFIG SET maxmemory  <span class="t-check">✓</span>  (1s)</div>
+          <div class="t-action">  helm pool.max=200  <span class="t-check">✓</span>  (2s)</div>
+          <div class="t-line"></div>
+          <div class="t-resolved">✓ Resolved   MTTD 47s   MTTR 2m 11s</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LOGS SECTION ════════════════════════════════════════════════ -->
+<section class="logs-section">
+  <div class="container">
+    <div class="logs-inner">
+      <div>
+        <span class="section-label">What's next</span>
+        <h2 class="logs-title"><strong>Best in Class Efficiency</strong><br>for Logs — coming next.</h2>
+        <p class="logs-body">We applied the same engineering discipline that made our metrics engine industry-leading to logs. We're not there yet — but the trajectory is clear and the targets are ambitious.</p>
+
+        <div class="logs-pillars">
+          <div class="logs-pillar">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 26 26" fill="none"><path d="M4 8c5 0 13-2 18 2" stroke="#00BFB3" stroke-width="2" stroke-linecap="round"/><path d="M4 14c5 0 13-2 18 2" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/><path d="M4 20c5 0 13-2 18 2" stroke="#69707D" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="pillar-content">
+              <h4>Compression</h4>
+              <p>Columnar storage and compressed binary doc values — storing significantly more for less.</p>
+            </div>
+            <div class="pillar-target">Target: &gt;2x</div>
+          </div>
+          <div class="logs-pillar">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 26 26" fill="none"><path d="M13 4v10l5 5" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="14" r="9" stroke="#00BFB3" stroke-width="2"/></svg>
+            </div>
+            <div class="pillar-content">
+              <h4>Ingestion Speed</h4>
+              <p>As volumes grow, ingestion keeps up — scaled across nodes with linear throughput gains.</p>
+            </div>
+            <div class="pillar-target">Target: &gt;2x</div>
+          </div>
+          <div class="logs-pillar">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 26 26" fill="none"><polyline points="3,19 8,12 13,15 18,7 23,10" stroke="#0077CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            </div>
+            <div class="pillar-content">
+              <h4>Query Performance</h4>
+              <p>LuceneSource DOC partitioning and Swiss hashtables already improving query times 3–11x.</p>
+            </div>
+            <div class="pillar-target">Improving fast</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual: progress bars -->
+      <div class="logs-visual">
+        <div class="logs-vis-title">Storage efficiency progress (bytes/record)</div>
+        <div class="logs-bar-row">
+          <div class="logs-bar-item">
+            <div class="logs-bar-label"><span>Elasticsearch (today)</span><strong>805 B</strong></div>
+            <div class="logs-bar-track"><div class="logs-bar-fill fill-muted" style="width:100%"></div></div>
+          </div>
+          <div class="logs-bar-item">
+            <div class="logs-bar-label"><span>Elasticsearch doc-values</span><strong>168 B</strong></div>
+            <div class="logs-bar-track"><div class="logs-bar-fill fill-blue" style="width:21%"></div></div>
+          </div>
+          <div class="logs-bar-item">
+            <div class="logs-bar-label"><span>ClickHouse baseline</span><strong>153 B</strong></div>
+            <div class="logs-bar-track"><div class="logs-bar-fill fill-teal" style="width:19%"></div></div>
+          </div>
+          <div class="logs-bar-item">
+            <div class="logs-bar-label"><span style="color:var(--blue);font-weight:700;">Elastic columnar target</span><strong style="color:var(--blue)">~150 B</strong></div>
+            <div class="logs-bar-track" style="background:rgba(0,119,204,.15)"><div class="logs-bar-fill fill-blue" style="width:18.5%;opacity:.5;border: 1px dashed var(--blue);"></div></div>
+          </div>
+        </div>
+        <div class="logs-coming">
+          <p><strong>Columnar logs</strong> are in active development. The doc-values-only configuration today is already within 10% of ClickHouse storage efficiency — full columnar mode will close that gap entirely.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MIGRATION ══════════════════════════════════════════════════ -->
+<section class="migration-section">
+  <div class="container">
+    <div class="migration-inner">
+      <div>
+        <div class="migration-label">Migration Tool — Tech Preview</div>
+        <h2 class="migration-title">Migrate from Datadog or Grafana <em>overnight.</em></h2>
+        <p class="migration-body">Automatically converts your dashboards and alerting rules from Datadog and Grafana into Elastic — dramatically reducing the cost and complexity of switching platforms.</p>
+        <div class="migration-steps">
+          <div class="migration-step">
+            <div class="step-num">1</div>
+            <div class="step-text"><h4>Connect your existing platform</h4><p>Point the tool at your Datadog org or Grafana instance using API credentials.</p></div>
+          </div>
+          <div class="migration-step">
+            <div class="step-num">2</div>
+            <div class="step-text"><h4>Automatic conversion</h4><p>Dashboards, panels, alert rules, and PromQL queries are translated to Elastic equivalents.</p></div>
+          </div>
+          <div class="migration-step">
+            <div class="step-num">3</div>
+            <div class="step-text"><h4>Go live in Kibana</h4><p>Your team is fully operational in Elastic with familiar workflows intact — same day.</p></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="#" class="btn btn-teal btn-lg">Request early access</a>
+          <a href="#" class="btn btn-ghost-dark btn-lg">Learn more</a>
+        </div>
+      </div>
+      <div class="migration-panel">
+        <div class="panel-header">
+          <div class="panel-logo">🔄</div>
+          <div><div class="panel-title">Migration in progress</div><div class="panel-sub">Datadog → Elastic Observability</div></div>
+        </div>
+        <div class="panel-items">
+          <div class="panel-item"><div class="panel-item-left"><span>📊</span><span>Infrastructure Overview Dashboard</span></div><span class="panel-item-badge badge-migrated">Migrated</span></div>
+          <div class="panel-item"><div class="panel-item-left"><span>🔔</span><span>CPU Alert — p95 &gt; 80%</span></div><span class="panel-item-badge badge-migrated">Migrated</span></div>
+          <div class="panel-item"><div class="panel-item-left"><span>📈</span><span>APM Service Map</span></div><span class="panel-item-badge badge-migrated">Migrated</span></div>
+          <div class="panel-item"><div class="panel-item-left"><span>🔔</span><span>Error Rate SLO Alert</span></div><span class="panel-item-badge badge-ready">Ready</span></div>
+          <div class="panel-item"><div class="panel-item-left"><span>📊</span><span>K8s Node Health Dashboard</span></div><span class="panel-item-badge badge-ready">Ready</span></div>
+        </div>
+        <div class="migration-progress">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill"></div></div>
+          <span class="progress-label">Complete in &lt;1 day</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CAPABILITIES ════════════════════════════════════════════════ -->
+<section class="cap-section">
+  <div class="container">
+    <div class="text-center mb-56">
+      <span class="section-label">Full-stack Observability</span>
+      <h2 class="section-title">One platform for <strong>everything</strong></h2>
+      <p class="section-sub">Logs, metrics, traces, APM, synthetic monitoring, and AIOps — unified in a single pane of glass.</p>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><path d="M3 7h20M3 13h14M3 19h10" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>Log Analytics</h3>
+        <p>Ingest and analyze log data at any scale with ES|QL and AI-powered anomaly detection via Streams.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><polyline points="3,20 8,13 13,16 18,8 23,11" stroke="#00BFB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <h3>Metrics Monitoring</h3>
+        <p>25x faster queries vs Prometheus and Mimir, with full PromQL support and industry-leading storage efficiency.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="10" stroke="#0077CC" stroke-width="2"/><path d="M13 8v6l4 4" stroke="#0077CC" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <h3>APM & Distributed Tracing</h3>
+        <p>End-to-end transaction visibility with automatic service maps and AI-driven anomaly correlation.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><rect x="3" y="7" width="20" height="12" rx="3" stroke="#00BFB3" stroke-width="2"/><path d="M9 13h8M9 17h5" stroke="#00BFB3" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <h3>Infrastructure Monitoring</h3>
+        <p>Real-time visibility into hosts, containers, Kubernetes, and cloud with unified inventory and AI-driven insights.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><path d="M13 3l2.5 7.5H23l-6.5 4.7 2.5 7.5L13 18l-6 4.7 2.5-7.5L3 10.5h7.5z" stroke="#0077CC" stroke-width="2" stroke-linejoin="round"/></svg></div>
+        <h3>AIOps & Alerting</h3>
+        <p>Reduce alert fatigue with ML-driven anomaly detection, automated RCA, and agentic remediation workflows.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon"><svg viewBox="0 0 26 26" fill="none"><rect x="5" y="5" width="16" height="16" rx="4" stroke="#00BFB3" stroke-width="2"/><path d="M9 13l3 3 5-5" stroke="#00BFB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>LLM Observability</h3>
+        <p>Monitor AI applications end-to-end — track token usage, latency, model quality, and cost in production.</p>
+        <a href="#" class="cap-link">Learn more</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Start building with agentic AI today.</h2>
+      <p>Join thousands of engineering teams who moved from Prometheus, Datadog, and Grafana to a faster, smarter, and unified observability platform.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn btn-teal btn-lg">Start free trial</a>
+        <a href="#" class="btn btn-ghost-dark btn-lg">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4>Observability</h4>
+      <ul><li><a href="#">Metrics</a></li><li><a href="#">Logs</a></li><li><a href="#">APM</a></li><li><a href="#">AIOps</a></li><li><a href="#">Synthetic Monitoring</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Documentation</h4>
+      <ul><li><a href="#">Getting started</a></li><li><a href="#">Metrics guide</a></li><li><a href="#">Migration guide</a></li><li><a href="#">ES|QL</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Partners</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul><li><a href="#">Webinars</a></li><li><a href="#">Case studies</a></li><li><a href="#">Benchmarks</a></li><li><a href="#">Community</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-logo">elastic</span>
+    <p>© 2026 Elasticsearch B.V. All rights reserved.</p>
+    <p><a href="#" style="color:rgba(255,255,255,.4);">Privacy</a> · <a href="#" style="color:rgba(255,255,255,.4);">Terms</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
