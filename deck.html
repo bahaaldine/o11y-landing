@@ -48,7 +48,7 @@
     .slide.state-next  { transform: translateX(100%);  opacity: 0; pointer-events: none; }
     .slide.state-far   { transform: translateX(100%);  opacity: 0; pointer-events: none; }
 
-    /* ── PROGRESS & NAV ── */
+    /* ── PROGRESS ── */
     .deck-progress {
       position: fixed; bottom: 0; left: 0; right: 0; height: 3px; z-index: 200;
       background: rgba(255,255,255,.1);
@@ -57,22 +57,6 @@
       height: 100%; background: var(--teal);
       transition: width .4s cubic-bezier(.4,0,.2,1);
     }
-
-    .deck-nav {
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-      z-index: 200; display: flex; align-items: center; gap: 16px;
-      background: rgba(7,16,31,.7); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,.12); border-radius: 100px;
-      padding: 8px 20px;
-    }
-    .deck-btn {
-      background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer;
-      font-size: 16px; padding: 4px 8px; border-radius: 6px;
-      transition: color .15s, background .15s;
-    }
-    .deck-btn:hover { color: #fff; background: rgba(255,255,255,.1); }
-    .deck-btn:disabled { opacity: .25; cursor: default; }
-    .deck-counter { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); min-width: 44px; text-align: center; }
 
     .slide-label {
       font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -343,11 +327,6 @@
     .btn-teal { background: var(--teal); color: var(--white); }
     .btn-ghost { background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.25); }
 
-    /* ── HINT ── */
-    .key-hint {
-      position: fixed; bottom: 18px; right: 24px; z-index: 200;
-      font-size: 11px; color: rgba(255,255,255,.25); font-family: var(--font);
-    }
   </style>
 </head>
 <body>
@@ -772,18 +751,9 @@
 
 </div><!-- /deck -->
 
-<!-- NAV -->
-<nav class="deck-nav">
-  <button class="deck-btn" id="btn-prev" disabled>←</button>
-  <span class="deck-counter" id="counter">1 / 10</span>
-  <button class="deck-btn" id="btn-next">→</button>
-</nav>
-
 <div class="deck-progress">
   <div class="deck-progress-fill" id="progress"></div>
 </div>
-
-<div class="key-hint">← → to navigate · Space to advance</div>
 
 <script>
   const slides = Array.from(document.querySelectorAll('.slide'));
@@ -796,14 +766,8 @@
       s.className = 'slide ' + (i < n ? 'state-prev' : i === n ? 'state-active' : 'state-next');
     });
     current = n;
-    document.getElementById('counter').textContent = (n + 1) + ' / ' + total;
     document.getElementById('progress').style.width = ((n + 1) / total * 100) + '%';
-    document.getElementById('btn-prev').disabled = n === 0;
-    document.getElementById('btn-next').disabled = n === total - 1;
   }
-
-  document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
-  document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
 
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
