@@ -83,32 +83,52 @@
 
     /* ── CMD ANIMATOR ── */
     .cmd-animator {
-      max-width: 720px; width: 100%; margin: 52px auto 0;
+      max-width: 820px; width: 100%; margin: 52px auto 0;
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.1);
-      border-radius: 20px; padding: 32px 52px;
+      border-radius: 20px; padding: 28px 44px;
     }
     .cmd-row {
       display: grid; grid-template-columns: 1fr 1px 1fr;
-      gap: 40px; align-items: center; min-height: 60px;
+      gap: 40px; align-items: center; min-height: 72px;
     }
-    .cmd-desc {
-      font-size: clamp(17px, 1.8vw, 24px); font-weight: 600;
-      color: rgba(255,255,255,.45); text-align: right;
-      letter-spacing: -.01em;
+    /* left: user intent bubble */
+    .cmd-intent {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
       opacity: 0; transform: translateY(6px);
       transition: opacity .35s ease, transform .35s ease;
     }
-    .cmd-desc.visible { opacity: 1; transform: translateY(0); }
-    .cmd-sep { width: 1px; height: 48px; background: rgba(255,255,255,.18); justify-self: center; }
+    .cmd-intent.visible { opacity: 1; transform: translateY(0); }
+    .cmd-intent-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.25);
+    }
+    .cmd-intent-bubble {
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px 14px 4px 14px;
+      padding: 10px 16px;
+      font-size: clamp(14px, 1.5vw, 18px); font-weight: 400; font-style: italic;
+      color: rgba(255,255,255,.75); line-height: 1.45; text-align: right;
+      max-width: 280px;
+    }
+    /* separator */
+    .cmd-sep { width: 1px; height: 56px; background: rgba(255,255,255,.15); justify-self: center; }
+    /* right: slash command */
+    .cmd-right {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    }
+    .cmd-right-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(0,191,179,.5);
+    }
     .cmd-slash-wrap { display: flex; align-items: center; }
     .cmd-slash {
       font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: clamp(24px, 2.6vw, 36px); font-weight: 700;
+      font-size: clamp(22px, 2.4vw, 32px); font-weight: 700;
       color: var(--teal); letter-spacing: -.02em;
     }
     .cmd-cursor {
-      display: inline-block; width: 2px; height: clamp(26px, 2.8vw, 38px);
+      display: inline-block; width: 2px; height: clamp(24px, 2.6vw, 34px);
       background: var(--teal); margin-left: 4px; border-radius: 1px;
       animation: cur-blink 1s step-end infinite;
     }
@@ -543,10 +563,16 @@
   <!-- Slash command animator -->
   <div class="cmd-animator">
     <div class="cmd-row">
-      <div class="cmd-desc" id="cmd-desc"></div>
+      <div class="cmd-intent" id="cmd-intent">
+        <span class="cmd-intent-label">you say</span>
+        <div class="cmd-intent-bubble" id="cmd-desc"></div>
+      </div>
       <div class="cmd-sep"></div>
-      <div class="cmd-slash-wrap">
-        <span class="cmd-slash" id="cmd-slash"></span><span class="cmd-cursor"></span>
+      <div class="cmd-right">
+        <span class="cmd-right-label">skill</span>
+        <div class="cmd-slash-wrap">
+          <span class="cmd-slash" id="cmd-slash"></span><span class="cmd-cursor"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -1264,30 +1290,30 @@
 
 <script>
   const cmdPairs = [
-    { desc: 'investigation',     cmd: '/rca'       },
-    { desc: 'live system model', cmd: '/topology'  },
-    { desc: 'observe',           cmd: '/observe'   },
-    { desc: 'alert triage',      cmd: '/alerts'    },
-    { desc: 'remediation',       cmd: '/remediate' },
+    { desc: 'my checkout service is down, what happened?', cmd: '/rca'       },
+    { desc: 'show me how my services connect',             cmd: '/topology'  },
+    { desc: "what's happening in production right now?",   cmd: '/observe'   },
+    { desc: 'why is this alert firing?',                   cmd: '/alerts'    },
+    { desc: 'fix the memory leak on the payment service',  cmd: '/remediate' },
   ];
 
-  const descEl  = document.getElementById('cmd-desc');
-  const slashEl = document.getElementById('cmd-slash');
-  let   idx     = 0;
-  let   typeTO  = null;
+  const intentEl = document.getElementById('cmd-intent');
+  const descEl   = document.getElementById('cmd-desc');
+  const slashEl  = document.getElementById('cmd-slash');
+  let   idx      = 0;
+  let   typeTO   = null;
 
   function typeCmd(str, pos, cb) {
     slashEl.textContent = str.slice(0, pos);
     typeTO = pos <= str.length
       ? setTimeout(() => typeCmd(str, pos + 1, cb), 65)
-      : setTimeout(cb, 2000);
+      : setTimeout(cb, 2200);
   }
 
   function runPair() {
     const pair = cmdPairs[idx];
 
-    // fade out
-    descEl.classList.remove('visible');
+    intentEl.classList.remove('visible');
     slashEl.style.transition = 'opacity .3s';
     slashEl.style.opacity = '0';
 
@@ -1295,14 +1321,14 @@
       descEl.textContent = pair.desc;
       slashEl.textContent = '';
       slashEl.style.opacity = '1';
-      descEl.classList.add('visible');
+      intentEl.classList.add('visible');
 
       clearTimeout(typeTO);
       typeCmd(pair.cmd, 0, () => {
         idx = (idx + 1) % cmdPairs.length;
         runPair();
       });
-    }, 350);
+    }, 380);
   }
 
   setTimeout(runPair, 400);
