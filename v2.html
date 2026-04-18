@@ -1276,11 +1276,13 @@
 
 <script>
   const cmdPairs = [
-    { desc: 'my checkout service is down, what happened?', cmd: '/rca'       },
-    { desc: 'show me how my services connect',             cmd: '/topology'  },
-    { desc: "what's happening in production right now?",   cmd: '/observe'   },
-    { desc: 'why is this alert firing?',                   cmd: '/alerts'    },
-    { desc: 'fix the memory leak on the payment service',  cmd: '/remediate' },
+    { desc: 'my checkout service is down, what happened?',       cmd: '/rca'            },
+    { desc: 'show me the live topology from my telemetry data',  cmd: '/topology'       },
+    { desc: "how healthy are my services right now?",            cmd: '/service-health' },
+    { desc: 'I need to start sending data to Elastic',           cmd: '/onboard'        },
+    { desc: 'are we meeting our reliability targets?',           cmd: '/slo'            },
+    { desc: 'find all errors in the payment logs',               cmd: '/log-search'     },
+    { desc: 'fix the memory leak on the payment service',        cmd: '/remediate'      },
   ];
 
   const intentEl = document.getElementById('cmd-intent');
