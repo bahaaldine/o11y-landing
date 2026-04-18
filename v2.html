@@ -94,33 +94,21 @@
     }
     /* left: user intent bubble */
     .cmd-intent {
-      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      display: flex; align-items: center; justify-content: flex-end;
       opacity: 0; transform: translateY(6px);
       transition: opacity .35s ease, transform .35s ease;
     }
     .cmd-intent.visible { opacity: 1; transform: translateY(0); }
-    .cmd-intent-label {
-      font-size: 10px; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: rgba(255,255,255,.25);
-    }
     .cmd-intent-bubble {
       background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
       border-radius: 14px 14px 4px 14px;
-      padding: 10px 16px;
+      padding: 12px 18px;
       font-size: clamp(14px, 1.5vw, 18px); font-weight: 400; font-style: italic;
       color: rgba(255,255,255,.75); line-height: 1.45; text-align: right;
-      max-width: 280px;
+      max-width: 300px;
     }
-    /* separator */
     .cmd-sep { width: 1px; height: 56px; background: rgba(255,255,255,.15); justify-self: center; }
-    /* right: slash command */
-    .cmd-right {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-    }
-    .cmd-right-label {
-      font-size: 10px; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: rgba(0,191,179,.5);
-    }
+    .cmd-right { display: flex; align-items: center; }
     .cmd-slash-wrap { display: flex; align-items: center; }
     .cmd-slash {
       font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
@@ -564,12 +552,10 @@
   <div class="cmd-animator">
     <div class="cmd-row">
       <div class="cmd-intent" id="cmd-intent">
-        <span class="cmd-intent-label">you say</span>
         <div class="cmd-intent-bubble" id="cmd-desc"></div>
       </div>
       <div class="cmd-sep"></div>
       <div class="cmd-right">
-        <span class="cmd-right-label">skill</span>
         <div class="cmd-slash-wrap">
           <span class="cmd-slash" id="cmd-slash"></span><span class="cmd-cursor"></span>
         </div>
