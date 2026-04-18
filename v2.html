@@ -81,6 +81,39 @@
     }
     .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
+    /* ── CMD ANIMATOR ── */
+    .cmd-animator {
+      max-width: 720px; width: 100%; margin: 52px auto 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 32px 52px;
+    }
+    .cmd-row {
+      display: grid; grid-template-columns: 1fr 1px 1fr;
+      gap: 40px; align-items: center; min-height: 60px;
+    }
+    .cmd-desc {
+      font-size: clamp(17px, 1.8vw, 24px); font-weight: 600;
+      color: rgba(255,255,255,.45); text-align: right;
+      letter-spacing: -.01em;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .cmd-desc.visible { opacity: 1; transform: translateY(0); }
+    .cmd-sep { width: 1px; height: 48px; background: rgba(255,255,255,.18); justify-self: center; }
+    .cmd-slash-wrap { display: flex; align-items: center; }
+    .cmd-slash {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: clamp(24px, 2.6vw, 36px); font-weight: 700;
+      color: var(--teal); letter-spacing: -.02em;
+    }
+    .cmd-cursor {
+      display: inline-block; width: 2px; height: clamp(26px, 2.8vw, 38px);
+      background: var(--teal); margin-left: 4px; border-radius: 1px;
+      animation: cur-blink 1s step-end infinite;
+    }
+    @keyframes cur-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
     /* ── SHARED ── */
     .container { max-width: 1200px; margin: 0 auto; }
     .section-label {
@@ -507,26 +540,14 @@
     <a href="#" class="btn btn-ghost-dark btn-lg">Watch demo</a>
   </div>
 
-  <!-- Badge row -->
-  <div style="margin-top:56px;display:flex;justify-content:center;align-items:stretch;gap:0;flex-wrap:wrap;">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 40px;">
-      <span style="font-size:48px;font-weight:800;color:#00BFB3;line-height:1;">25x</span>
-      <span style="font-size:13px;color:rgba(255,255,255,.6);text-align:center;max-width:110px;line-height:1.4;">faster queries vs Prometheus &amp; Mimir</span>
-    </div>
-    <div style="width:1px;background:rgba(255,255,255,.12);align-self:stretch;"></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 40px;">
-      <span style="font-size:48px;font-weight:800;color:#00BFB3;line-height:1;">2.5x</span>
-      <span style="font-size:13px;color:rgba(255,255,255,.6);text-align:center;max-width:110px;line-height:1.4;">storage savings vs Prometheus</span>
-    </div>
-    <div style="width:1px;background:rgba(255,255,255,.12);align-self:stretch;"></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 40px;">
-      <span style="font-size:48px;font-weight:800;color:#00BFB3;line-height:1;">428K</span>
-      <span style="font-size:13px;color:rgba(255,255,255,.6);text-align:center;max-width:110px;line-height:1.4;">samples/sec ingest throughput</span>
-    </div>
-    <div style="width:1px;background:rgba(255,255,255,.12);align-self:stretch;"></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 40px;">
-      <span style="font-size:48px;font-weight:800;color:#00BFB3;line-height:1;">1 day</span>
-      <span style="font-size:13px;color:rgba(255,255,255,.6);text-align:center;max-width:110px;line-height:1.4;">to migrate from Datadog or Grafana</span>
+  <!-- Slash command animator -->
+  <div class="cmd-animator">
+    <div class="cmd-row">
+      <div class="cmd-desc" id="cmd-desc"></div>
+      <div class="cmd-sep"></div>
+      <div class="cmd-slash-wrap">
+        <span class="cmd-slash" id="cmd-slash"></span><span class="cmd-cursor"></span>
+      </div>
     </div>
   </div>
 </section>
@@ -1241,5 +1262,50 @@
   </div>
 </footer>
 
+<script>
+  const cmdPairs = [
+    { desc: 'investigation',     cmd: '/rca'       },
+    { desc: 'live system model', cmd: '/topology'  },
+    { desc: 'observe',           cmd: '/observe'   },
+    { desc: 'alert triage',      cmd: '/alerts'    },
+    { desc: 'remediation',       cmd: '/remediate' },
+  ];
+
+  const descEl  = document.getElementById('cmd-desc');
+  const slashEl = document.getElementById('cmd-slash');
+  let   idx     = 0;
+  let   typeTO  = null;
+
+  function typeCmd(str, pos, cb) {
+    slashEl.textContent = str.slice(0, pos);
+    typeTO = pos <= str.length
+      ? setTimeout(() => typeCmd(str, pos + 1, cb), 65)
+      : setTimeout(cb, 2000);
+  }
+
+  function runPair() {
+    const pair = cmdPairs[idx];
+
+    // fade out
+    descEl.classList.remove('visible');
+    slashEl.style.transition = 'opacity .3s';
+    slashEl.style.opacity = '0';
+
+    setTimeout(() => {
+      descEl.textContent = pair.desc;
+      slashEl.textContent = '';
+      slashEl.style.opacity = '1';
+      descEl.classList.add('visible');
+
+      clearTimeout(typeTO);
+      typeCmd(pair.cmd, 0, () => {
+        idx = (idx + 1) % cmdPairs.length;
+        runPair();
+      });
+    }, 350);
+  }
+
+  setTimeout(runPair, 400);
+</script>
 </body>
 </html>
